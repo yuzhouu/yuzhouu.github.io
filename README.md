@@ -17,6 +17,16 @@ pnpm preview
 
 `pnpm build` runs Astro's type checker before generating `dist/`. Use `pnpm format:check` to check formatting.
 
+## Appearance
+
+The left side of the footer offers **System**, **Light**, and **Dark** as three
+small, unframed icon buttons in a single row. System is the default and follows
+changes to the device's appearance. Explicit choices
+are saved locally and shared across pages and tabs. Theme initialization runs in
+the document head to avoid a flash of the wrong colors; without JavaScript, the
+site still follows the system preference. Article code highlighting, swallow
+artwork, and the guestbook follow the same theme.
+
 ## Writing posts
 
 Create a `.mdoc` file in `src/content/posts/`. Its filename determines the post URL: for example, `hello.mdoc` becomes `/posts/hello/`.
@@ -173,12 +183,13 @@ The widget loads its iframe lazily and provides a GitHub link when JavaScript or
 the embedded service is unavailable. Its backlink always uses the guestbook's
 production canonical URL, including when viewing the site locally.
 
-The custom light theme lives in `src/styles/giscus.css`. Astro emits a versioned CSS
-asset which giscus loads inside its iframe; ordinary site CSS cannot style that
+The custom themes live in `src/styles/giscus.css` and `src/styles/giscus-dark.css`.
+Astro emits versioned CSS assets which giscus loads inside its iframe; ordinary site CSS cannot style that
 iframe. Development embeds the same CSS as a data URL so the HTTPS iframe does not
 need to request a local HTTP stylesheet. Production uses the emitted CSS asset,
 served by GitHub Pages with cross-origin access. Review the `.gsc-*` overrides if a
-future giscus update changes its internal markup.
+future giscus update changes its internal markup. Theme changes update the iframe
+through giscus's `setConfig` message without reloading the discussion.
 
 ### Source files
 

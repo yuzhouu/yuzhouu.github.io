@@ -1,0 +1,66 @@
+<script is:inline>
+  (() => {
+    const storageKey = "site-theme";
+    const root = document.documentElement;
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const normalize = (value) =>
+      value === "light" || value === "dark" ? value : "system";
+    let preference = "system";
+
+    try {
+      preference = normalize(localStorage.getItem(storageKey));
+    } catch {
+      // System preference still works when browser storage is unavailable.
+    }
+
+    function applyTheme() {
+      const theme =
+        preference === "system"
+          ? systemTheme.matches
+            ? "dark"
+            : "light"
+          : preference;
+      root.dataset.theme = theme;
+      root.dataset.themePreference = preference;
+      document.querySelector('meta[name="theme-color"]').content =
+        theme === "dark" ? "#191b1e" : "#ffffff";
+
+      document.querySelectorAll("[data-theme-option]").forEach((button) => {
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.themeOption === preference),
+        );
+      });
+      document.dispatchEvent(new CustomEvent("themechange", { detail: theme }));
+    }
+
+    // Runs in the head, before page content paints.
+    applyTheme();
+    systemTheme.addEventListener("change", () => {
+      if (preference === "system") applyTheme();
+    });
+    window.addEventListener("storage", (event) => {
+      if (event.key !== storageKey && event.key !== null) return;
+      preference = normalize(event.newValue);
+      applyTheme();
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+      const control = document.querySelector("[data-theme-control]");
+      if (!control) return;
+      control.hidden = false;
+      applyTheme();
+      control.querySelectorAll("[data-theme-option]").forEach((button) => {
+        button.addEventListener("click", () => {
+          preference = normalize(button.dataset.themeOption);
+          try {
+            if (preference === "system") localStorage.removeItem(storageKey);
+            else localStorage.setItem(storageKey, preference);
+          } catch {
+            // Keep the selection for this page even if it cannot be saved.
+          }
+          applyTheme();
+        });
+      });
+    });
+  })();
+</script>

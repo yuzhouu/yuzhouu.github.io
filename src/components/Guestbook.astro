@@ -2,37 +2,25 @@
 import { comments } from "../data/comments";
 import commentTheme from "../styles/giscus.css?url";
 import inlineTheme from "../styles/giscus.css?inline";
+import darkTheme from "../styles/giscus-dark.css?url";
+import inlineDarkTheme from "../styles/giscus-dark.css?inline";
 const configured = Boolean(comments.repoId && comments.categoryId);
 // An HTTPS iframe cannot reliably load styles from a local HTTP development server.
-const theme = import.meta.env.DEV
-  ? `data:text/css;base64,${Buffer.from(inlineTheme).toString("base64")}`
-  : new URL(commentTheme, Astro.site).href;
+const development = import.meta.env.DEV;
+const themes = {
+  light: development
+    ? `data:text/css;base64,${Buffer.from(inlineTheme).toString("base64")}`
+    : new URL(commentTheme, Astro.site).href,
+  dark: development
+    ? `data:text/css;base64,${Buffer.from(inlineDarkTheme).toString("base64")}`
+    : new URL(darkTheme, Astro.site).href,
+};
 const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
 ---
 
 {configured && (
   <section class="guestbook" aria-label="Guestbook messages">
-    <div class="giscus">
-      <script
-        is:inline
-        src="https://giscus.app/client.js"
-        data-repo={comments.repo}
-        data-repo-id={comments.repoId}
-        data-category={comments.category}
-        data-category-id={comments.categoryId}
-        data-mapping="specific"
-        data-term="Guestbook"
-        data-strict="1"
-        data-reactions-enabled="0"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme={import.meta.env.DEV ? "light" : theme}
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async
-      />
-    </div>
+    <div class="giscus" />
     <p class="comments-fallback">
       <a href={discussionsUrl}>View discussions on GitHub</a>
     </p>
@@ -54,24 +42,62 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
   }
 </style>
 
-{import.meta.env.DEV && configured && <script
+{configured && <script
   is:inline
-  define:vars={{ devTheme: theme }}
+  define:vars={{ commentConfig: { comments, themes, development } }}
 >
-  // Send the local theme after the widget is ready, keeping its URL short.
-  function applyDevelopmentTheme(event) {
-    const frame = document.querySelector(".giscus iframe");
-    if (
-      event.origin !== "https://giscus.app" ||
-      event.source !== frame?.contentWindow ||
-      !event.data?.giscus
-    )
-      return;
-    frame.contentWindow.postMessage(
-      { giscus: { setConfig: { theme: devTheme } } },
-      "https://giscus.app",
-    );
-    window.removeEventListener("message", applyDevelopmentTheme);
-  }
-  window.addEventListener("message", applyDevelopmentTheme);
+  (() => {
+    const { comments, themes, development } = commentConfig;
+    const container = document.querySelector(".giscus");
+    const getTheme = () => document.documentElement.dataset.theme || "light";
+    const client = document.createElement("script");
+    client.src = "https://giscus.app/client.js";
+    client.async = true;
+    client.crossOrigin = "anonymous";
+    Object.assign(client.dataset, {
+      repo: comments.repo,
+      repoId: comments.repoId,
+      category: comments.category,
+      categoryId: comments.categoryId,
+      mapping: "specific",
+      term: "Guestbook",
+      strict: "1",
+      reactionsEnabled: "0",
+      emitMetadata: "0",
+      inputPosition: "top",
+      theme: development ? getTheme() : themes[getTheme()],
+      lang: "en",
+      loading: "lazy",
+    });
+
+    let readyFrame;
+    let appliedTheme;
+    function syncTheme() {
+      const theme = themes[getTheme()];
+      client.dataset.theme = development ? getTheme() : theme;
+      if (!readyFrame || appliedTheme === theme) return;
+      readyFrame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme } } },
+        "https://giscus.app",
+      );
+      appliedTheme = theme;
+    }
+    window.addEventListener("message", (event) => {
+      const frame = container.querySelector("iframe");
+      if (
+        event.origin !== "https://giscus.app" ||
+        event.source !== frame?.contentWindow ||
+        !event.data?.giscus
+      )
+        return;
+      if (readyFrame !== frame) {
+        readyFrame = frame;
+        appliedTheme = undefined;
+      }
+      // Also handles a theme change while the lazy iframe was still loading.
+      syncTheme();
+    });
+    document.addEventListener("themechange", syncTheme);
+    container.append(client);
+  })();
 </script>}

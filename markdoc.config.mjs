@@ -2,7 +2,12 @@ import { component, defineMarkdocConfig, nodes } from "@astrojs/markdoc/config";
 import shiki from "@astrojs/markdoc/shiki";
 
 export default defineMarkdocConfig({
-  extends: [shiki({ theme: "github-light" })],
+  extends: [
+    shiki({
+      themes: { light: "github-light", dark: "github-dark" },
+      defaultColor: false,
+    }),
+  ],
   nodes: {
     document: { ...nodes.document, render: "div" },
     heading: {

@@ -21,6 +21,14 @@
   --muted: #717171;
   --line: #dededb;
   --accent: #355c78;
+  --accent-hover: #163f5d;
+  --link-line: #9aaebc;
+  --selection: #e0eaf0;
+  --highlight: #edf3f7;
+  --quote: #555;
+  --code-block: #f6f7f8;
+  --code-inline: #f3f4f5;
+  --artwork-filter: none;
   --serif: "Source Serif 4 Variable", "Iowan Old Style", Georgia, serif;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --mono: "SFMono-Regular", Consolas, monospace;
@@ -32,6 +40,41 @@
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
+/* The media query also supports readers with JavaScript disabled. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #191b1e;
+    --ink: #e4e3df;
+    --muted: #a3a5a8;
+    --line: #393c41;
+    --accent: #9dc5e0;
+    --accent-hover: #c4e3f8;
+    --link-line: #657f92;
+    --selection: #354b5c;
+    --highlight: #283642;
+    --quote: #bfc0c1;
+    --code-block: #22262b;
+    --code-inline: #2a2e34;
+    --artwork-filter: invert(0.88);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #191b1e;
+  --ink: #e4e3df;
+  --muted: #a3a5a8;
+  --line: #393c41;
+  --accent: #9dc5e0;
+  --accent-hover: #c4e3f8;
+  --link-line: #657f92;
+  --selection: #354b5c;
+  --highlight: #283642;
+  --quote: #bfc0c1;
+  --code-block: #22262b;
+  --code-inline: #2a2e34;
+  --artwork-filter: invert(0.88);
+}
 * {
   box-sizing: border-box;
 }
@@ -42,19 +85,20 @@ a {
   color: var(--accent);
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
-  text-decoration-color: #9aaebc;
+  text-decoration-color: var(--link-line);
   text-underline-offset: 3px;
 }
 a:hover {
-  color: #163f5d;
+  color: var(--accent-hover);
   text-decoration-color: currentColor;
 }
-a:focus-visible {
+a:focus-visible,
+button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
 ::selection {
-  background: #e0eaf0;
+  background: var(--selection);
 }
 img,
 svg {
@@ -116,6 +160,10 @@ ul {
   display: block;
   width: 31px;
   flex-shrink: 0;
+}
+.brand-mark,
+.swallow-art {
+  filter: var(--artwork-filter);
 }
 .site-header nav {
   display: flex;
@@ -218,16 +266,52 @@ main:focus {
 }
 .site-footer {
   display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  gap: 16px;
-  margin-top: 27px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 36px;
   border-top: 1px solid var(--line);
   padding: 12px 0 28px;
   color: var(--muted);
   font-family: var(--sans);
   font-size: 12px;
   line-height: 1.5;
+}
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.theme-control:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.theme-control button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 18px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+.theme-control button:hover {
+  color: var(--ink);
+}
+.theme-control button[aria-pressed="true"] {
+  color: var(--ink);
+}
+.theme-control button[aria-pressed="true"] svg {
+  stroke-width: 2;
+}
+.theme-control svg {
+  width: 16px;
+  height: 16px;
 }
 .page-heading,
 .reading-column {
@@ -306,7 +390,7 @@ main:focus {
   text-decoration: underline;
 }
 .prose :is(h1, h2, h3, h4, h5, h6):target {
-  background: #edf3f7;
+  background: var(--highlight);
 }
 .prose {
   line-height: 1.6;
@@ -343,11 +427,11 @@ main:focus {
   margin: 15px 0;
   border-left: 2px solid var(--line);
   padding-left: 15px;
-  color: #555;
+  color: var(--quote);
 }
 .prose pre {
   padding: 12px 14px;
-  background: #f6f7f8;
+  background: var(--code-block);
   overflow-x: auto;
   font-size: 12px;
   line-height: 1.65;
@@ -357,11 +441,28 @@ main:focus {
   font-size: 0.8em;
 }
 .prose :not(pre) > code {
-  background: #f3f4f5;
+  background: var(--code-inline);
   padding: 0.1em 0.25em;
 }
 .prose pre code {
   font-size: inherit;
+}
+.prose .astro-code,
+.prose .astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+:root[data-theme="dark"] .astro-code,
+:root[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .astro-code,
+  :root:not([data-theme="light"]) .astro-code span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
 }
 .prose img {
   display: block;
@@ -438,7 +539,6 @@ main:focus {
     font-size: 16px;
   }
   .site-footer {
-    margin-top: 24px;
     padding-bottom: 24px;
   }
   .article-heading h1 {

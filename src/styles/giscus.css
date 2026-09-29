@@ -100,10 +100,12 @@ main .gsc-loading-image {
 
 :root {
   color-scheme: light;
+  --giscus-paper: #fff;
+  --giscus-selection: #e0eaf0;
 }
 
 body {
-  background: #fff;
+  background: var(--giscus-paper);
 }
 
 main {
@@ -124,7 +126,7 @@ main {
 }
 
 .gsc-comment-box-tabs {
-  background: #fff;
+  background: var(--color-canvas-default);
 }
 
 .gsc-comment-box .btn {
@@ -142,5 +144,5 @@ main {
 }
 
 ::selection {
-  background: #e0eaf0;
+  background: var(--giscus-selection);
 }
