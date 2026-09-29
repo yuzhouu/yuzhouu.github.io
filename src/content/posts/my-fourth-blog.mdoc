@@ -1,63 +1,27 @@
 ---
 title: My Fourth Blog
-description: Another rebuild, still with Astro. Markdoc and the swallow are back, with a simpler layout this time.
+description: A little thank-you to AI for helping me make a page I like. Still like Markdoc, and the swallow is still here.
 publishedAt: 2026-09-29
 lang: en
 draft: false
 ---
 
-> Written by AI (OpenAI Codex), based on the code and changes from this blog's rebuild.
+> Written with AI (OpenAI Codex).
 
-I wrote [My Third Blog](/posts/my-third-blog/) in 2023. It's now 2026, and the blog has had another rebuild.
+Here we are, blog number four.
 
-The first version used Gatsby. The second was Next.js with Markdoc, and the third was adapted from AstroPaper. This one still uses Astro, but the pages and styles are written from scratch, and Markdoc is back for the posts.
+UI design has never been my strong suit. Getting a page to work is one thing; making it look good usually leaves me stuck.
 
-That makes four.
+So, a small thank-you to AI. With its help, even I managed to make a page with a little bit of design to it. Nothing fancy, but I like looking at it. That makes me happy.
 
-## Keeping the home page small
+## Still like Markdoc
 
-The home page has a short introduction, a few project links, and the latest posts. Each project gets a sentence explaining what it does. Anyone who wants to know more can follow the link.
-
-Posts use a single column, a white background, and a serif typeface. Navigation and dates use system fonts. The swallow still sits beside my name.
-
-There's very little to maintain. The home page and archive share a post list, articles share a layout, and the styles live together. When I want to adjust some spacing or change a link, I know where to look.
-
-## Back to Markdoc
-
-I used Markdoc for the second blog. This time, it's connected to Astro's content collections.
-
-To write a post, I create a `.mdoc` file, add a title, description, and date, and start writing. The filename determines the URL. The home page, archive, and RSS feed all use the same collection of posts.
-
-An unfinished post can stay in the repository as a draft without appearing in any of those places. I can come back to it later without keeping a separate copy somewhere else.
-
-Section headings have their own links, and posts with several sections get a collapsible table of contents. Sharing a particular section is just a matter of copying its link.
-
-## A little work on fonts and images
-
-The generated pages don't need executable client-side scripts. The table of contents uses the browser's native disclosure element, and section links are ordinary anchors.
-
-Fonts accounted for a larger download. The original Source Serif 4 normal and italic files came to about 253 KB combined. Switching to the weight-only versions brought that down to about 102 KB.
-
-There is a tradeoff: the smaller files keep variable weights but lose optical sizing, which adjusts the letterforms for different text sizes. I checked the body text, headings, and italics again, and the layout still works. Only the normal face is preloaded; the browser fetches italics when they're needed.
-
-Images are part of the build now too. Local screenshots and photos become WebP files in several sizes. Images in the public directory or on other websites declare their width and height so the page can reserve space before they load.
-
-Most of this is preparation for future posts. Adding a screenshot shouldn't mean going through compression and sizing by hand every time.
-
-## Making posts easier to follow and share
-
-There's an RSS link in the footer now. Readers can subscribe in their own feed reader instead of remembering to check the site.
-
-Shared links have a preview image with the same white background, text, and swallow. Each article's title, description, and publication date are included in its metadata.
-
-These details stay out of sight while you're reading the page, but they help a post travel beyond the site, into a feed reader or a message to someone else.
+Still like Markdoc, so it's here too. A `.mdoc` file, a title, and some words. A comfortable way to write.
 
 ## The swallow is still here
 
 ![Swallows in flight](/assets/swallow.svg)
 
-The swallow from the first blog made it into this version too. It still flies, with a still version for readers who have enabled reduced motion in their browser.
-
-The earlier blogs left me with Markdoc, automatic deployment, and this little drawing. This rebuild brings them together again.
+The swallow from the first blog made it into this version too. It still flies.
 
 The site is ready again. Time to put something in it.
