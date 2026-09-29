@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import SpotifyTrack from "../components/SpotifyTrack.astro";
+import { site } from "../data/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import { formatDate } from "../lib/posts";
 import { getTimeline } from "../lib/timeline";
@@ -13,14 +14,10 @@ const items = await Promise.all(
 );
 ---
 
-<SiteLayout
-  title="Timeline"
-  description="Posts, projects, music, and little things along the way."
-  active="timeline"
->
+<SiteLayout active="timeline">
   <header class="page-heading">
     <h1>Timeline</h1>
-    <p>Posts, projects, music, and little things along the way.</p>
+    <p>{site.tagline}</p>
   </header>
 
   <ol class="timeline" aria-label="Latest updates">

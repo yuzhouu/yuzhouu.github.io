@@ -5,7 +5,7 @@ import { getTimeline } from "../lib/timeline";
 
 export const GET: APIRoute = async (context) =>
   rss({
-    title: `${site.name}'s Blog`,
+    title: site.title,
     description: site.description,
     site: context.site!,
     items: (await getTimeline()).map((item) => ({
@@ -13,7 +13,8 @@ export const GET: APIRoute = async (context) =>
         item.kind === "project" ? item.entry.data.name : item.entry.data.title,
       description: item.entry.data.description,
       pubDate: item.entry.data.publishedAt,
-      link: item.href,
+      // Absolute URLs keep the RSS generator from appending a slash to anchors.
+      link: new URL(item.href, context.site!).href,
     })),
     customData: "<language>en</language>",
   });

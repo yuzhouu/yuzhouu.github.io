@@ -13,8 +13,8 @@
 </svg>
 
   <text x="198" y="150" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="#252525">Zhou Yu</text>
-  <text x="88" y="302" font-family="Georgia, serif" font-size="54" fill="#252525">Notes on projects, code,</text>
-  <text x="88" y="372" font-family="Georgia, serif" font-size="54" fill="#252525">and everyday life.</text>
+  <text x="88" y="302" font-family="Georgia, serif" font-size="54" fill="#252525">Projects, notes &amp; music.</text>
+  <text x="88" y="372" font-family="Georgia, serif" font-size="54" fill="#252525">Little things along the way.</text>
   <path d="M88 465 H1112" stroke="#dededb" stroke-width="2"/>
   <text x="88" y="534" font-family="Arial, sans-serif" font-size="27" fill="#355c78">yuzhouu.github.io</text>
   <text x="1112" y="534" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#717171">A personal blog</text>

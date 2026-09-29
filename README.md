@@ -63,6 +63,14 @@ Images load lazily by default. Use `loading="eager"` on the image tag for an ima
 
 The shared preview image is `public/og.png` (1200 × 630); its editable SVG source is `src/assets/social-card.svg`. Run `pnpm og:generate` after editing the SVG. Page titles and descriptions appear in Open Graph and Twitter card metadata. Published articles also include `BlogPosting` JSON-LD with their canonical URL, author, publication date, and optional revision date.
 
+The home page and RSS use the title **Zhou Yu · Projects, Notes & Music** and the
+default description from `src/data/site.ts`. The same file holds the short tagline
+used on Timeline, About, and in preview-image alternative text. Keep the social
+card SVG copy in sync when changing that tagline, then regenerate `public/og.png`.
+Other pages keep their own titles and descriptions; the post archive has a
+dedicated summary, and individual articles use their frontmatter. Timeline shares
+remain part of the home page, with anchor links rather than separate detail pages.
+
 ## Timeline
 
 The **Timeline** navigation link opens the home page (`/`), where published articles,

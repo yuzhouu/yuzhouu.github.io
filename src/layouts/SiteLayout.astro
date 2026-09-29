@@ -23,9 +23,7 @@ const {
   lang = "en",
   noindex = false,
 } = Astro.props;
-const pageTitle = title
-  ? `${title} · ${site.name}`
-  : `${site.name} · Personal Blog`;
+const pageTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const shareImage = new URL("/og.png", Astro.site);
 const articleSchema =
@@ -85,7 +83,7 @@ const articleSchema =
     <link
       rel="alternate"
       type="application/rss+xml"
-      title={`${site.name}'s Blog`}
+      title={site.title}
       href={new URL("/rss.xml", Astro.site)}
     />
     <meta property="og:type" content={article ? "article" : "website"} />
@@ -97,18 +95,12 @@ const articleSchema =
     <meta property="og:image" content={shareImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta
-      property="og:image:alt"
-      content={`${site.name} — Notes on projects, code, and everyday life.`}
-    />
+    <meta property="og:image:alt" content={`${site.name} — ${site.tagline}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={shareImage} />
-    <meta
-      name="twitter:image:alt"
-      content={`${site.name} — Notes on projects, code, and everyday life.`}
-    />
+    <meta name="twitter:image:alt" content={`${site.name} — ${site.tagline}`} />
     {publishedAt && (
       <meta
         property="article:published_time"
