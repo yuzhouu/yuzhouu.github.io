@@ -14,4 +14,19 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+const timeline = defineCollection({
+  loader: glob({ pattern: "**/*.mdoc", base: "./src/content/timeline" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    publishedAt: z.coerce.date(),
+    lang: z.enum(["en", "zh-CN", "ja"]).default("en"),
+    draft: z.boolean().default(false),
+    spotifyTrackId: z
+      .string()
+      .regex(/^[A-Za-z0-9]{22}$/)
+      .optional(),
+  }),
+});
+
+export const collections = { posts, timeline };

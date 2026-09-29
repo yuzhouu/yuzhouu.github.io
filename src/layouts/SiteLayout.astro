@@ -6,7 +6,7 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
-  active?: "home" | "posts" | "guestbook";
+  active?: "timeline" | "posts" | "about" | "guestbook";
   article?: boolean;
   publishedAt?: Date;
   updatedAt?: Date;
@@ -44,7 +44,6 @@ const articleSchema =
         inLanguage: lang,
       }
     : undefined;
-const BrandHeading = active === "home" ? "h1" : "div";
 ---
 
 <!doctype html>
@@ -136,7 +135,7 @@ const BrandHeading = active === "home" ? "h1" : "div";
     </a>
     <div class="site-shell">
       <header class="site-header">
-        <BrandHeading class="site-identity">
+        <div class="site-identity">
           <a class="brand" href="/" aria-label="Zhou Yu, home">
             <img
               class="brand-mark"
@@ -147,16 +146,16 @@ const BrandHeading = active === "home" ? "h1" : "div";
             />
             <span>{site.name}</span>
           </a>
-        </BrandHeading>
+        </div>
         <nav aria-label="Main navigation">
-          <a href="/" aria-current={active === "home" ? "page" : undefined}>
-            Home
+          <a href="/" aria-current={active === "timeline" ? "page" : undefined}>
+            Timeline
           </a>
           <a
-            href="/posts/"
-            aria-current={active === "posts" ? "page" : undefined}
+            href="/about/"
+            aria-current={active === "about" ? "page" : undefined}
           >
-            Posts
+            About
           </a>
           <a
             href="/guestbook/"

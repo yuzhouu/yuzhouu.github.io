@@ -1,0 +1,29 @@
+---
+import { site } from "../data/site";
+const home = new URL("/", Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={home} />
+    <title>Timeline · {site.name}</title>
+    <script is:inline>
+      const destination = new URL("/", window.location.href);
+      destination.search = window.location.search;
+      destination.hash = window.location.hash;
+      window.location.replace(destination.href);
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/" />
+    </noscript>
+  </head>
+  <body>
+    <p>
+      The timeline is now on the <a href="/">home page</a>.
+    </p>
+  </body>
+</html>

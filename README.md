@@ -2,7 +2,7 @@
 
 A static personal blog built from scratch with Astro 7 and the official Markdoc integration. No blog template, React, or Tailwind.
 
-The layout follows a compact, text-first approach: inline project links, a shared post list, and locally hosted Source Serif 4 fonts. The weight-only font files keep the normal and italic faces to about 102 KB combined; only the normal face is preloaded. Home shows the five most recent posts, while the archive lists every published post by year.
+The layout follows a compact, text-first approach, with locally hosted Source Serif 4 fonts. The weight-only font files keep the normal and italic faces to about 102 KB combined; only the normal face is preloaded. The home page is a timeline of articles, music, and short shares. The post archive lists every published article by year, while About holds the introduction, projects, and contact links.
 
 ## Local development
 
@@ -59,11 +59,55 @@ Images load lazily by default. Use `loading="eager"` on the image tag for an ima
 
 ### Subscription and sharing
 
-`/rss.xml` uses the same published-post list as the site. Every page declares the feed for RSS readers, and the footer has a subscription link.
+`/rss.xml` includes published articles and timeline shares, newest first. Article links lead to the full post; shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
 
 The shared preview image is `public/og.png` (1200 × 630); its editable SVG source is `src/assets/social-card.svg`. Run `pnpm og:generate` after editing the SVG. Page titles and descriptions appear in Open Graph and Twitter card metadata. Published articles also include `BlogPosting` JSON-LD with their canonical URL, author, publication date, and optional revision date.
 
+## Timeline
+
+The **Timeline** navigation link opens the home page (`/`), where published articles and
+short shares appear together in reverse chronological order. Articles are pulled
+from the existing posts collection automatically, with a title and summary linking
+to the full post. Each timeline date is a permanent link to that entry.
+
+The old `/timeline/` address redirects to the home page, preserving entry anchors
+and query parameters when JavaScript is enabled. Without JavaScript it redirects
+to the top of the home page. RSS share links point directly to the new home-page
+anchors. The old redirect page is excluded from the sitemap.
+
+To share a song or a short note, create a `.mdoc` file in `src/content/timeline/`:
+
+```md
+---
+title: ルミリー — 2022 Remaster
+description: Gesu No Kiwami Otome
+publishedAt: 2026-09-29
+lang: ja
+spotifyTrackId: 6Xz7bz7k4pjaQRmCCll9OG
+draft: false
+---
+
+Optional words to go with the song.
+```
+
+Copy `spotifyTrackId` from the end of a Spotify track URL (without any query
+parameters). Songs include a compact, lazy-loaded Spotify player, so visitors can
+play them directly on the timeline, plus an ordinary Spotify link. Playback
+availability and full-track access are controlled by Spotify for each listener.
+There is no autoplay or API key. For a text or link share, omit `spotifyTrackId`
+and write in the body using the same Markdoc syntax as articles. `description` is
+optional, `lang` defaults to `en`, and `draft: true` hides the share from both the
+timeline and RSS. Keep filenames stable to preserve shared entry links.
+
 ## Structure
+
+### About
+
+`/about/` contains the introduction, project list, GitHub profile, email link, and
+five most recent articles that previously appeared on the home page. Its **Posts**
+section shows each article's title, date, and summary, with a link to the complete
+`/posts/` archive. The main navigation contains **Timeline**, **About**, and
+**Guestbook**; articles remain visible on the timeline and in the archive.
 
 ### Guestbook
 
@@ -100,7 +144,7 @@ future giscus update changes its internal markup.
 
 ### Source files
 
-- `src/pages/`: Home, post archive, post pages, guestbook, RSS, and 404.
+- `src/pages/`: Timeline home, About, post archive, post pages, guestbook, RSS, legacy timeline redirect, and 404.
 - `src/layouts/SiteLayout.astro`: Shared page layout and metadata.
 - `src/content.config.ts`: Markdoc content collection and validation.
 - `src/data/site.ts`: Profile information and project links.

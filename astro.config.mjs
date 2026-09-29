@@ -6,5 +6,8 @@ export default defineConfig({
   site: "https://yuzhouu.github.io",
   output: "static",
   trailingSlash: "always",
-  integrations: [markdoc(), sitemap()],
+  integrations: [
+    markdoc(),
+    sitemap({ filter: (page) => new URL(page).pathname !== "/timeline/" }),
+  ],
 });

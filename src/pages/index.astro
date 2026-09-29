@@ -1,43 +1,164 @@
 ---
-import PostList from "../components/PostList.astro";
-import { projects, site } from "../data/site";
+import { render } from "astro:content";
+import SpotifyTrack from "../components/SpotifyTrack.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { getPosts } from "../lib/posts";
+import { formatDate } from "../lib/posts";
+import { getTimeline } from "../lib/timeline";
 
-const posts = (await getPosts()).slice(0, 5);
+const items = await Promise.all(
+  (await getTimeline()).map(async (item) => ({
+    ...item,
+    Content: item.kind === "share" ? (await render(item.entry)).Content : null,
+  })),
+);
 ---
 
-<SiteLayout active="home">
-  <div class="intro">
-    <p>A coder making simple, useful tools.</p>
-    <p>Notes on projects, code, and everyday life.</p>
-    <p class="contact-links">
-      <a href={site.github} target="_blank" rel="noopener noreferrer">
-        GitHub
-      </a>
-      <span aria-hidden="true">·</span>
-      <a href={site.email}>Email</a>
-    </p>
-  </div>
+<SiteLayout
+  title="Timeline"
+  description="Posts, music, and little things along the way."
+  active="timeline"
+>
+  <header class="page-heading">
+    <h1>Timeline</h1>
+    <p>Posts, music, and little things along the way.</p>
+  </header>
 
-  <section class="projects" aria-labelledby="projects-title">
-    <h2 id="projects-title">Projects</h2>
-    <ul class="project-list">
-      {projects.map((project) => (
-        <li>
-          <a href={project.href} target="_blank" rel="noopener noreferrer">
-            {project.name}
-          </a>
-          {" — "}
-          {project.description}
+  <ol class="timeline" aria-label="Latest updates">
+    {items.map((item) => {
+      const { entry, Content } = item;
+      const trackId =
+        item.kind === "share" ? item.entry.data.spotifyTrackId : undefined;
+      const kind = item.kind === "post" ? "Post" : trackId ? "Music" : "Note";
+      return (
+        <li class="timeline-item" id={item.id}>
+          <article aria-labelledby={`${item.id}-title`}>
+            <div class="timeline-meta">
+              <a
+                class="timeline-date"
+                href={`/#${encodeURIComponent(item.id)}`}
+                aria-label={`Link to ${entry.data.title}`}
+              >
+                <time datetime={entry.data.publishedAt.toISOString()}>
+                  {formatDate(entry.data.publishedAt, "short")}
+                </time>
+              </a>
+              <span aria-hidden="true">·</span>
+              <span>{kind}</span>
+            </div>
+            <div lang={entry.data.lang}>
+              <h2 id={`${item.id}-title`}>
+                {item.kind === "post" ? (
+                  <a href={item.href}>{entry.data.title}</a>
+                ) : (
+                  entry.data.title
+                )}
+              </h2>
+              {entry.data.description && (
+                <p class="timeline-description">{entry.data.description}</p>
+              )}
+              {Content && (
+                <div class="prose timeline-body">
+                  <Content />
+                </div>
+              )}
+            </div>
+            {trackId && (
+              <>
+                <SpotifyTrack trackId={trackId} title={entry.data.title} />
+                <a
+                  class="spotify-link"
+                  href={`https://open.spotify.com/track/${trackId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open in Spotify <span aria-hidden="true">↗</span>
+                </a>
+              </>
+            )}
+          </article>
         </li>
-      ))}
-    </ul>
-  </section>
-  {posts.length > 0 && (
-    <section class="recent-posts" aria-labelledby="posts-title">
-      <h2 id="posts-title">Posts</h2>
-      <PostList posts={posts} />
-    </section>
+      );
+    })}
+  </ol>
+  {items.length === 0 && (
+    <p class="empty-state">Nothing here yet. Check back soon.</p>
   )}
 </SiteLayout>
+
+<style>
+  .timeline {
+    list-style: none;
+    margin: 28px 0 0 5px;
+    padding: 0;
+    border-left: 1px solid var(--line);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 0 0 30px 25px;
+    scroll-margin-top: 24px;
+  }
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: -4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 4px var(--paper);
+  }
+  .timeline-item:target::before {
+    background: var(--accent);
+  }
+  .timeline-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+  }
+  .timeline-date {
+    color: inherit;
+    text-decoration: none;
+  }
+  .timeline-date:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .timeline-item h2 {
+    font-size: 19px;
+    overflow-wrap: anywhere;
+  }
+  .timeline-description {
+    margin-top: 5px;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .timeline-body {
+    font-size: 16px;
+  }
+  .spotify-link {
+    display: inline-block;
+    margin-top: 9px;
+    font-family: var(--sans);
+    font-size: 12px;
+  }
+  @media (max-width: 600px) {
+    .timeline-item {
+      padding-left: 18px;
+    }
+    .timeline-item h2 {
+      font-size: 18px;
+    }
+  }
+</style>

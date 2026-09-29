@@ -1,0 +1,59 @@
+---
+import PostList from "../components/PostList.astro";
+import { projects, site } from "../data/site";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { getPosts } from "../lib/posts";
+
+const posts = (await getPosts()).slice(0, 5);
+---
+
+<SiteLayout
+  title="About"
+  description="A coder making simple, useful tools. Projects and ways to get in touch."
+  active="about"
+>
+  <header class="page-heading">
+    <h1>About</h1>
+    <p>A coder making simple, useful tools.</p>
+    <p>Notes on projects, code, and everyday life.</p>
+    <p class="contact-links">
+      <a href={site.github} target="_blank" rel="noopener noreferrer">
+        GitHub
+      </a>
+      <span aria-hidden="true">·</span>
+      <a href={site.email}>Email</a>
+    </p>
+  </header>
+
+  <section class="projects" aria-labelledby="projects-title">
+    <h2 id="projects-title">Projects</h2>
+    <ul class="project-list">
+      {projects.map((project) => (
+        <li>
+          <a href={project.href} target="_blank" rel="noopener noreferrer">
+            {project.name}
+          </a>
+          {" — "}
+          {project.description}
+        </li>
+      ))}
+    </ul>
+  </section>
+  {posts.length > 0 && (
+    <section class="recent-posts" aria-labelledby="posts-title">
+      <h2 id="posts-title">Posts</h2>
+      <PostList posts={posts} />
+      <p class="archive-link">
+        <a href="/posts/">Browse all posts</a>
+      </p>
+    </section>
+  )}
+</SiteLayout>
+
+<style>
+  .archive-link {
+    margin-top: 14px;
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+</style>

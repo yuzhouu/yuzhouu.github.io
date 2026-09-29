@@ -1,18 +1,18 @@
 import rss from "@astrojs/rss";
 import type { APIRoute } from "astro";
 import { site } from "../data/site";
-import { getPosts, postUrl } from "../lib/posts";
+import { getTimeline } from "../lib/timeline";
 
 export const GET: APIRoute = async (context) =>
   rss({
     title: `${site.name}'s Blog`,
     description: site.description,
     site: context.site!,
-    items: (await getPosts()).map((post) => ({
-      title: post.data.title,
-      description: post.data.description,
-      pubDate: post.data.publishedAt,
-      link: postUrl(post.id),
+    items: (await getTimeline()).map(({ entry, href }) => ({
+      title: entry.data.title,
+      description: entry.data.description,
+      pubDate: entry.data.publishedAt,
+      link: href,
     })),
     customData: "<language>en</language>",
   });
