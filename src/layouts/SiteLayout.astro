@@ -6,7 +6,7 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
-  active?: "home" | "posts";
+  active?: "home" | "posts" | "guestbook";
   article?: boolean;
   publishedAt?: Date;
   updatedAt?: Date;
@@ -73,6 +73,9 @@ const BrandHeading = active === "home" ? "h1" : "div";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" type="image/png" href="/favicon.png" />
     <link rel="canonical" href={canonical} />
+    {active === "guestbook" && (
+      <meta name="giscus:backlink" content={canonical.href} />
+    )}
     <link
       rel="preload"
       href={serifFont}
@@ -154,6 +157,12 @@ const BrandHeading = active === "home" ? "h1" : "div";
             aria-current={active === "posts" ? "page" : undefined}
           >
             Posts
+          </a>
+          <a
+            href="/guestbook/"
+            aria-current={active === "guestbook" ? "page" : undefined}
+          >
+            Guestbook
           </a>
         </nav>
       </header>

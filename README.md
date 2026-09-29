@@ -65,7 +65,42 @@ The shared preview image is `public/og.png` (1200 × 630); its editable SVG sour
 
 ## Structure
 
-- `src/pages/`: Home, post archive, post pages, RSS, and 404.
+### Guestbook
+
+The `/guestbook/` page uses [giscus](https://giscus.app), backed by GitHub Discussions
+in `yuzhouu/yuzhouu.github.io`. The shared navigation links to this site-wide board;
+articles do not embed comments. Reading messages requires no account; posting
+requires GitHub sign-in and giscus authorization. The blog still deploys statically.
+
+One-time setup:
+
+1. Enable Discussions in the repository's settings.
+2. Install the [giscus GitHub App](https://github.com/apps/giscus), selecting only
+   this repository. It needs metadata read access and Discussions read/write access.
+3. At [giscus.app](https://giscus.app), select this repository and the
+   `Announcements` category. Copy the repository and category IDs into
+   `src/data/comments.ts`. These IDs are public, not secrets. The comment section
+   stays hidden until both IDs are configured.
+
+All guestbook messages use the fixed mapping term `Guestbook` with strict matching.
+Keep this term stable to retain the same discussion even if the page URL or title
+changes. The first message creates the discussion automatically; new messages do
+not require a site rebuild.
+
+The widget loads its iframe lazily and provides a GitHub link when JavaScript or
+the embedded service is unavailable. Its backlink always uses the guestbook's
+production canonical URL, including when viewing the site locally.
+
+The custom light theme lives in `src/styles/giscus.css`. Astro emits a versioned CSS
+asset which giscus loads inside its iframe; ordinary site CSS cannot style that
+iframe. Development embeds the same CSS as a data URL so the HTTPS iframe does not
+need to request a local HTTP stylesheet. Production uses the emitted CSS asset,
+served by GitHub Pages with cross-origin access. Review the `.gsc-*` overrides if a
+future giscus update changes its internal markup.
+
+### Source files
+
+- `src/pages/`: Home, post archive, post pages, guestbook, RSS, and 404.
 - `src/layouts/SiteLayout.astro`: Shared page layout and metadata.
 - `src/content.config.ts`: Markdoc content collection and validation.
 - `src/data/site.ts`: Profile information and project links.

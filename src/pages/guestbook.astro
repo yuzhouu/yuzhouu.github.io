@@ -1,0 +1,16 @@
+---
+import Guestbook from "../components/Guestbook.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+---
+
+<SiteLayout
+  title="Guestbook"
+  description="Say hello, ask a question, or leave a note."
+  active="guestbook"
+>
+  <header class="page-heading">
+    <h1>Guestbook</h1>
+    <p>Say hello, ask a question, or leave a note.</p>
+  </header>
+  <Guestbook />
+</SiteLayout>

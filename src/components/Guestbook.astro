@@ -1,0 +1,77 @@
+---
+import { comments } from "../data/comments";
+import commentTheme from "../styles/giscus.css?url";
+import inlineTheme from "../styles/giscus.css?inline";
+const configured = Boolean(comments.repoId && comments.categoryId);
+// An HTTPS iframe cannot reliably load styles from a local HTTP development server.
+const theme = import.meta.env.DEV
+  ? `data:text/css;base64,${Buffer.from(inlineTheme).toString("base64")}`
+  : new URL(commentTheme, Astro.site).href;
+const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
+---
+
+{configured && (
+  <section class="guestbook" aria-label="Guestbook messages">
+    <div class="giscus">
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        data-repo={comments.repo}
+        data-repo-id={comments.repoId}
+        data-category={comments.category}
+        data-category-id={comments.categoryId}
+        data-mapping="specific"
+        data-term="Guestbook"
+        data-strict="1"
+        data-reactions-enabled="0"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme={import.meta.env.DEV ? "light" : theme}
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      />
+    </div>
+    <p class="comments-fallback">
+      <a href={discussionsUrl}>View discussions on GitHub</a>
+    </p>
+  </section>
+)}
+
+<style>
+  .guestbook {
+    margin-top: 24px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+
+  .comments-fallback {
+    margin-top: 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+</style>
+
+{import.meta.env.DEV && configured && <script
+  is:inline
+  define:vars={{ devTheme: theme }}
+>
+  // Send the local theme after the widget is ready, keeping its URL short.
+  function applyDevelopmentTheme(event) {
+    const frame = document.querySelector(".giscus iframe");
+    if (
+      event.origin !== "https://giscus.app" ||
+      event.source !== frame?.contentWindow ||
+      !event.data?.giscus
+    )
+      return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: devTheme } } },
+      "https://giscus.app",
+    );
+    window.removeEventListener("message", applyDevelopmentTheme);
+  }
+  window.addEventListener("message", applyDevelopmentTheme);
+</script>}
