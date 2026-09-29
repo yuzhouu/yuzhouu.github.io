@@ -2,7 +2,7 @@
 
 A static personal blog built from scratch with Astro 7 and the official Markdoc integration. No blog template, React, or Tailwind.
 
-The layout follows a compact, text-first approach, with locally hosted Source Serif 4 fonts. The weight-only font files keep the normal and italic faces to about 102 KB combined; only the normal face is preloaded. The home page is a timeline of articles, music, and short shares. The post archive lists every published article by year, while About holds the introduction, projects, and contact links.
+The layout follows a compact, text-first approach, with locally hosted Source Serif 4 fonts. The weight-only font files keep the normal and italic faces to about 102 KB combined; only the normal face is preloaded. The home page is a timeline of articles, projects, music, and short shares. The post archive lists every published article by year, while About holds the introduction, projects, and contact links.
 
 ## Local development
 
@@ -59,16 +59,17 @@ Images load lazily by default. Use `loading="eager"` on the image tag for an ima
 
 ### Subscription and sharing
 
-`/rss.xml` includes published articles and timeline shares, newest first. Article links lead to the full post; shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
+`/rss.xml` includes published articles, projects, and timeline shares, newest first. Article links lead to the full post, project links open the project website, and shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
 
 The shared preview image is `public/og.png` (1200 × 630); its editable SVG source is `src/assets/social-card.svg`. Run `pnpm og:generate` after editing the SVG. Page titles and descriptions appear in Open Graph and Twitter card metadata. Published articles also include `BlogPosting` JSON-LD with their canonical URL, author, publication date, and optional revision date.
 
 ## Timeline
 
-The **Timeline** navigation link opens the home page (`/`), where published articles and
-short shares appear together in reverse chronological order. Articles are pulled
+The **Timeline** navigation link opens the home page (`/`), where published articles,
+projects, and short shares appear together in reverse chronological order. Articles are pulled
 from the existing posts collection automatically, with a title and summary linking
-to the full post. Each timeline date is a permanent link to that entry.
+to the full post. Projects come from the projects collection, show a **Project** label,
+and link to their website. Each timeline date is a permanent link to that entry.
 
 The old `/timeline/` address redirects to the home page, preserving entry anchors
 and query parameters when JavaScript is enabled. Without JavaScript it redirects
@@ -101,7 +102,7 @@ timeline and RSS. Keep filenames stable to preserve shared entry links.
 
 ## Projects
 
-Each project is a `.mdoc` file in `src/content/projects/`. About reads the project
+Each project is a `.mdoc` file in `src/content/projects/`. About, Timeline, and RSS read the project
 collection automatically; adding or editing a project does not require changing
 TypeScript or page templates.
 
@@ -110,17 +111,23 @@ TypeScript or page templates.
 name: Sidebrowse
 description: Web pages in your browser sidebar.
 href: https://yuzhouu.github.io/side-browser/
+publishedAt: 2026-09-15
+lang: en # Use zh-CN for Chinese project descriptions.
 order: 10
 draft: false
 ---
 ```
 
-`name`, `description`, and `href` are required. The link must be a complete HTTP or
-HTTPS URL. Lower `order` values appear first; it defaults to `0`, and equal values
-are sorted by filename. `draft: true` hides a project; it defaults to `false`.
+`name`, `description`, `href`, and `publishedAt` are required. The link must be a complete HTTP or
+HTTPS URL. `publishedAt` is the timeline publication date and controls its position
+in the timeline and RSS. The existing projects use GitHub repository creation dates
+(`created_at`): Sidebrowse on September 15, 2026, Lento EPUB on August 31, 2026,
+and Prelude on August 27, 2026.
+`lang` defaults to `en`. On About, lower `order` values appear first; it defaults to `0`, and equal values
+are sorted by filename. `draft: true` hides a project from About, Timeline, and RSS; it defaults to `false`.
 Delete its file to remove a project. The list uses these frontmatter fields only;
 the Markdoc body is not displayed. After editing content, commit and deploy as
-usual. Projects do not appear in the timeline or RSS feed.
+usual. Keep filenames stable to preserve timeline entry links.
 
 ## Structure
 
@@ -171,7 +178,7 @@ future giscus update changes its internal markup.
 - `src/layouts/SiteLayout.astro`: Shared page layout and metadata.
 - `src/content.config.ts`: Markdoc content collection and validation.
 - `src/data/site.ts`: Profile information and contact links.
-- `src/content/projects/`: Project names, descriptions, links, and display order.
+- `src/content/projects/`: Project names, descriptions, links, publication dates, and About display order.
 - `src/styles/global.css`: Site styles and responsive layouts.
 - `public/favicon.svg`, `public/favicon.png`, `public/assets/swallow.svg`: Original swallow assets.
 

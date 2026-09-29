@@ -8,11 +8,12 @@ export const GET: APIRoute = async (context) =>
     title: `${site.name}'s Blog`,
     description: site.description,
     site: context.site!,
-    items: (await getTimeline()).map(({ entry, href }) => ({
-      title: entry.data.title,
-      description: entry.data.description,
-      pubDate: entry.data.publishedAt,
-      link: href,
+    items: (await getTimeline()).map((item) => ({
+      title:
+        item.kind === "project" ? item.entry.data.name : item.entry.data.title,
+      description: item.entry.data.description,
+      pubDate: item.entry.data.publishedAt,
+      link: item.href,
     })),
     customData: "<language>en</language>",
   });

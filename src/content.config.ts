@@ -35,6 +35,8 @@ const projects = defineCollection({
     name: z.string(),
     description: z.string(),
     href: z.url({ protocol: /^https?$/ }),
+    publishedAt: z.coerce.date(),
+    lang: z.enum(["en", "zh-CN"]).default("en"),
     order: z.number().int().default(0),
     draft: z.boolean().default(false),
   }),

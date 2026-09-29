@@ -15,20 +15,29 @@ const items = await Promise.all(
 
 <SiteLayout
   title="Timeline"
-  description="Posts, music, and little things along the way."
+  description="Posts, projects, music, and little things along the way."
   active="timeline"
 >
   <header class="page-heading">
     <h1>Timeline</h1>
-    <p>Posts, music, and little things along the way.</p>
+    <p>Posts, projects, music, and little things along the way.</p>
   </header>
 
   <ol class="timeline" aria-label="Latest updates">
     {items.map((item) => {
       const { entry, Content } = item;
+      const title =
+        item.kind === "project" ? item.entry.data.name : item.entry.data.title;
       const trackId =
         item.kind === "share" ? item.entry.data.spotifyTrackId : undefined;
-      const kind = item.kind === "post" ? "Post" : trackId ? "Music" : "Note";
+      const kind =
+        item.kind === "project"
+          ? "Project"
+          : item.kind === "post"
+            ? "Post"
+            : trackId
+              ? "Music"
+              : "Note";
       return (
         <li class="timeline-item" id={item.id}>
           <article aria-labelledby={`${item.id}-title`}>
@@ -36,7 +45,7 @@ const items = await Promise.all(
               <a
                 class="timeline-date"
                 href={`/#${encodeURIComponent(item.id)}`}
-                aria-label={`Link to ${entry.data.title}`}
+                aria-label={`Link to ${title}`}
               >
                 <time datetime={entry.data.publishedAt.toISOString()}>
                   {formatDate(entry.data.publishedAt, "short")}
@@ -47,10 +56,14 @@ const items = await Promise.all(
             </div>
             <div lang={entry.data.lang}>
               <h2 id={`${item.id}-title`}>
-                {item.kind === "post" ? (
-                  <a href={item.href}>{entry.data.title}</a>
+                {item.kind === "project" ? (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer">
+                    {title} <span aria-hidden="true">↗</span>
+                  </a>
+                ) : item.kind === "post" ? (
+                  <a href={item.href}>{title}</a>
                 ) : (
-                  entry.data.title
+                  title
                 )}
               </h2>
               {entry.data.description && (
@@ -64,7 +77,7 @@ const items = await Promise.all(
             </div>
             {trackId && (
               <>
-                <SpotifyTrack trackId={trackId} title={entry.data.title} />
+                <SpotifyTrack trackId={trackId} title={title} />
                 <a
                   class="spotify-link"
                   href={`https://open.spotify.com/track/${trackId}`}
