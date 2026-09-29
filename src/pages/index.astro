@@ -37,7 +37,6 @@ const items = await Promise.all(
               : "Note";
       return (
         <li class="timeline-item" id={item.id}>
-          <span class="timeline-marker" aria-hidden="true"></span>
           <article aria-labelledby={`${item.id}-title`}>
             <div class="timeline-meta">
               <a
@@ -53,16 +52,6 @@ const items = await Promise.all(
               <span>{kind}</span>
             </div>
             <div lang={entry.data.lang}>
-              {trackId && Content && (
-                <div class="music-recommendation">
-                  <div class="prose timeline-body">
-                    <span class="music-recommendation-label" lang="zh-CN">
-                      「听歌碎念」
-                    </span>
-                    <Content />
-                  </div>
-                </div>
-              )}
               {item.kind === "project" ? (
                 <div class="timeline-project">
                   <h2 id={`${item.id}-title`}>
@@ -90,6 +79,16 @@ const items = await Promise.all(
                     <p class="timeline-description">{entry.data.description}</p>
                   )}
                 </>
+              )}
+              {trackId && Content && (
+                <div class="music-recommendation">
+                  <div class="prose timeline-body">
+                    <span class="music-recommendation-label" lang="zh-CN">
+                      「听歌碎念」
+                    </span>
+                    <Content />
+                  </div>
+                </div>
               )}
               {item.kind === "project" && (
                 <p class="project-platforms">
@@ -128,28 +127,15 @@ const items = await Promise.all(
 <style>
   .timeline {
     list-style: none;
-    margin: 28px 0 0 5px;
+    margin: 28px 0 0;
     padding: 0;
-    border-left: 1px solid var(--line);
   }
   .timeline-item {
-    position: relative;
-    padding: 0 0 36px 25px;
+    padding: 0 0 36px;
     scroll-margin-top: 24px;
   }
   .timeline-item:last-child {
     padding-bottom: 0;
-  }
-  .timeline-marker {
-    position: absolute;
-    top: 6px;
-    left: -4px;
-    width: 7px;
-    height: 7px;
-    border: 1px solid color-mix(in srgb, var(--line), var(--muted) 45%);
-    border-radius: 50%;
-    background: var(--paper);
-    box-shadow: 0 0 0 4px var(--paper);
   }
   .timeline-meta {
     display: flex;
@@ -181,6 +167,7 @@ const items = await Promise.all(
   .timeline-item .timeline-project h2 {
     display: inline;
     font: inherit;
+    font-weight: 600;
     letter-spacing: inherit;
   }
   .timeline-description {
@@ -193,7 +180,7 @@ const items = await Promise.all(
     font-size: 16px;
   }
   .music-recommendation {
-    margin: 16px 0 28px;
+    margin: 12px 0 16px;
   }
   .music-recommendation .timeline-body {
     display: flow-root;
@@ -211,9 +198,6 @@ const items = await Promise.all(
     font-size: 12px;
   }
   @media (max-width: 600px) {
-    .timeline-item {
-      padding-left: 18px;
-    }
     .timeline-item h2 {
       font-size: 18px;
     }
