@@ -1,0 +1,14 @@
+---
+interface Props {
+  id: string;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+}
+const { id, level } = Astro.props;
+const Heading = `h${level}` as `h${Props["level"]}`;
+---
+
+<Heading {id} tabindex="-1">
+  <a class="heading-link" href={`#${id}`}>
+    <slot />
+  </a>
+</Heading>

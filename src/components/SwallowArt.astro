@@ -1,0 +1,47 @@
+---
+import originalSwallows from "../../public/assets/swallow.svg?raw";
+
+// Keep the original asset untouched; fit its drawing and flight paths to this frame.
+const artwork = originalSwallows
+  .replace('viewBox="0 0 1600 600"', 'viewBox="-30 -25 570 410"')
+  .replace(/\s+id="[^"]*"/g, "");
+---
+
+<span class="swallow-art" aria-hidden="true">
+  <span class="swallow-motion" set:html={artwork} />
+  <img
+    class="swallow-still"
+    src="/favicon.svg"
+    alt=""
+    width="200"
+    height="200"
+  />
+</span>
+
+<style>
+  .swallow-art {
+    display: block;
+    width: 100%;
+    aspect-ratio: 570 / 410;
+  }
+  .swallow-motion {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .swallow-still {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .swallow-motion {
+      display: none;
+    }
+    .swallow-still {
+      display: block;
+      width: 65%;
+      height: 100%;
+      object-fit: contain;
+      margin-inline: auto;
+    }
+  }
+</style>

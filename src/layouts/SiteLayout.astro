@@ -1,0 +1,157 @@
+---
+import { site } from "../data/site";
+import serifFont from "@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  active?: "home" | "posts";
+  article?: boolean;
+  publishedAt?: Date;
+  updatedAt?: Date;
+  lang?: "en" | "zh-CN";
+  noindex?: boolean;
+}
+const {
+  title,
+  description = site.description,
+  active,
+  article = false,
+  publishedAt,
+  updatedAt,
+  lang = "en",
+  noindex = false,
+} = Astro.props;
+const pageTitle = title
+  ? `${title} · ${site.name}`
+  : `${site.name} · Personal Blog`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const shareImage = new URL("/og.png", Astro.site);
+const articleSchema =
+  article && publishedAt
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: title,
+        description,
+        url: canonical.href,
+        mainEntityOfPage: canonical.href,
+        image: [shareImage.href],
+        datePublished: publishedAt.toISOString(),
+        ...(updatedAt && { dateModified: updatedAt.toISOString() }),
+        author: { "@type": "Person", name: site.name, url: site.github },
+        inLanguage: lang,
+      }
+    : undefined;
+const BrandHeading = active === "home" ? "h1" : "div";
+---
+
+<!doctype html>
+<html {lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content="#ffffff" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={canonical} />
+    <link
+      rel="preload"
+      href={serifFont}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.name}'s Blog`}
+      href={new URL("/rss.xml", Astro.site)}
+    />
+    <meta property="og:type" content={article ? "article" : "website"} />
+    <meta property="og:locale" content={lang === "zh-CN" ? "zh_CN" : "en_US"} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content={`${site.name} — Notes on projects, code, and everyday life.`}
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+    <meta
+      name="twitter:image:alt"
+      content={`${site.name} — Notes on projects, code, and everyday life.`}
+    />
+    {publishedAt && (
+      <meta
+        property="article:published_time"
+        content={publishedAt.toISOString()}
+      />
+    )}
+    {updatedAt && (
+      <meta
+        property="article:modified_time"
+        content={updatedAt.toISOString()}
+      />
+    )}
+    {articleSchema && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(articleSchema).replace(/</g, "\\u003c")}
+      />
+    )}
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <div class="site-shell">
+      <header class="site-header">
+        <BrandHeading class="site-identity">
+          <a class="brand" href="/" aria-label="Zhou Yu, home">
+            <img
+              class="brand-mark"
+              src="/favicon.svg"
+              width="31"
+              height="31"
+              alt=""
+            />
+            <span>{site.name}</span>
+          </a>
+        </BrandHeading>
+        <nav aria-label="Main navigation">
+          <a href="/" aria-current={active === "home" ? "page" : undefined}>
+            Home
+          </a>
+          <a
+            href="/posts/"
+            aria-current={active === "posts" ? "page" : undefined}
+          >
+            Posts
+          </a>
+        </nav>
+      </header>
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <span>
+          © {new Date().getFullYear()} {site.name}
+        </span>
+        <a href="/rss.xml">RSS</a>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,18 +1,32 @@
 ---
-import { SITE } from "@config";
-import Posts from "@layouts/Posts.astro";
-import getSortedPosts from "@utils/getSortedPosts";
-import getPageNumbers from "@utils/getPageNumbers";
+import PostList from "../../components/PostList.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { getPosts } from "../../lib/posts";
 
-import { getCollection } from "astro:content";
-
-const posts = await getCollection("blog");
-
-const sortedPosts = getSortedPosts(posts);
-
-const totalPages = getPageNumbers(sortedPosts.length);
-
-const paginatedPosts = sortedPosts.slice(0, SITE.postPerPage);
+const posts = await getPosts();
+const years = [
+  ...new Set(posts.map((post) => post.data.publishedAt.getUTCFullYear())),
+];
 ---
 
-<Posts posts={paginatedPosts} pageNum={1} totalPages={totalPages.length} />
+<SiteLayout title="Posts" active="posts">
+  <header class="page-heading">
+    <h1>Posts</h1>
+    <p>On writing code, making things, and everyday life.</p>
+  </header>
+  <div class="archive">
+    {years.map((year) => (
+      <section class="archive-year" aria-labelledby={`year-${year}`}>
+        <h2 id={`year-${year}`}>{year}</h2>
+        <PostList
+          posts={posts.filter(
+            (post) => post.data.publishedAt.getUTCFullYear() === year,
+          )}
+        />
+      </section>
+    ))}
+    {posts.length === 0 && (
+      <p class="empty-state">No posts yet. Check back soon.</p>
+    )}
+  </div>
+</SiteLayout>

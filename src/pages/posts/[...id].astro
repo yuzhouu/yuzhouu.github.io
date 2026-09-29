@@ -1,0 +1,74 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { formatDate, getPosts } from "../../lib/posts";
+
+export async function getStaticPaths() {
+  return (await getPosts()).map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"posts">;
+}
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const sections = headings.filter((heading) => heading.depth === 2);
+---
+
+<SiteLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishedAt={post.data.publishedAt}
+  updatedAt={post.data.updatedAt}
+  lang={post.data.lang}
+  active="posts"
+  article
+>
+  <div class="reading-column">
+    <a class="back-link" href="/posts/">
+      All posts
+    </a>
+    <article>
+      <header class="article-heading">
+        <h1>{post.data.title}</h1>
+        <time datetime={post.data.publishedAt.toISOString()}>
+          {formatDate(post.data.publishedAt)}
+        </time>
+        {post.data.updatedAt && (
+          <span class="article-updated">
+            Updated{" "}
+            <time datetime={post.data.updatedAt.toISOString()}>
+              {formatDate(post.data.updatedAt)}
+            </time>
+          </span>
+        )}
+      </header>
+      {sections.length >= 3 && (
+        <details class="article-toc">
+          <summary>On this page</summary>
+          <nav aria-label="Table of contents">
+            <ol>
+              {sections.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </details>
+      )}
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+    <div class="article-end">
+      <a class="back-link" href="/posts/">
+        Back to posts
+      </a>
+    </div>
+  </div>
+</SiteLayout>
