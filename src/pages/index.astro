@@ -37,6 +37,7 @@ const items = await Promise.all(
               : "Note";
       return (
         <li class="timeline-item" id={item.id}>
+          <span class="timeline-marker" aria-hidden="true"></span>
           <article aria-labelledby={`${item.id}-title`}>
             <div class="timeline-meta">
               <a
@@ -62,19 +63,33 @@ const items = await Promise.all(
                   </div>
                 </div>
               )}
-              <h2 id={`${item.id}-title`}>
-                {item.kind === "project" ? (
-                  <a href={item.href} target="_blank" rel="noopener noreferrer">
-                    {title} <span aria-hidden="true">↗</span>
-                  </a>
-                ) : item.kind === "post" ? (
-                  <a href={item.href}>{title}</a>
-                ) : (
-                  title
-                )}
-              </h2>
-              {entry.data.description && (
-                <p class="timeline-description">{entry.data.description}</p>
+              {item.kind === "project" ? (
+                <div class="timeline-project">
+                  <h2 id={`${item.id}-title`}>
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {title}
+                    </a>
+                  </h2>
+                  {" — "}
+                  {item.entry.data.description}
+                </div>
+              ) : (
+                <>
+                  <h2 id={`${item.id}-title`}>
+                    {item.kind === "post" ? (
+                      <a href={item.href}>{title}</a>
+                    ) : (
+                      title
+                    )}
+                  </h2>
+                  {entry.data.description && (
+                    <p class="timeline-description">{entry.data.description}</p>
+                  )}
+                </>
               )}
               {item.kind === "project" && (
                 <p class="project-platforms">
@@ -125,19 +140,16 @@ const items = await Promise.all(
   .timeline-item:last-child {
     padding-bottom: 0;
   }
-  .timeline-item::before {
-    content: "";
+  .timeline-marker {
     position: absolute;
     top: 6px;
     left: -4px;
     width: 7px;
     height: 7px;
+    border: 1px solid var(--line);
     border-radius: 50%;
-    background: var(--muted);
+    background: var(--paper);
     box-shadow: 0 0 0 4px var(--paper);
-  }
-  .timeline-item:target::before {
-    background: var(--accent);
   }
   .timeline-meta {
     display: flex;
@@ -162,6 +174,14 @@ const items = await Promise.all(
   .timeline-item h2 {
     font-size: 19px;
     overflow-wrap: anywhere;
+  }
+  .timeline-project {
+    overflow-wrap: anywhere;
+  }
+  .timeline-item .timeline-project h2 {
+    display: inline;
+    font: inherit;
+    letter-spacing: inherit;
   }
   .timeline-description {
     margin-top: 5px;
