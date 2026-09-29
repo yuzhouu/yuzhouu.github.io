@@ -99,6 +99,29 @@ and write in the body using the same Markdoc syntax as articles. `description` i
 optional, `lang` defaults to `en`, and `draft: true` hides the share from both the
 timeline and RSS. Keep filenames stable to preserve shared entry links.
 
+## Projects
+
+Each project is a `.mdoc` file in `src/content/projects/`. About reads the project
+collection automatically; adding or editing a project does not require changing
+TypeScript or page templates.
+
+```md
+---
+name: Sidebrowse
+description: Web pages in your browser sidebar.
+href: https://yuzhouu.github.io/side-browser/
+order: 10
+draft: false
+---
+```
+
+`name`, `description`, and `href` are required. The link must be a complete HTTP or
+HTTPS URL. Lower `order` values appear first; it defaults to `0`, and equal values
+are sorted by filename. `draft: true` hides a project; it defaults to `false`.
+Delete its file to remove a project. The list uses these frontmatter fields only;
+the Markdoc body is not displayed. After editing content, commit and deploy as
+usual. Projects do not appear in the timeline or RSS feed.
+
 ## Structure
 
 ### About
@@ -147,7 +170,8 @@ future giscus update changes its internal markup.
 - `src/pages/`: Timeline home, About, post archive, post pages, guestbook, RSS, legacy timeline redirect, and 404.
 - `src/layouts/SiteLayout.astro`: Shared page layout and metadata.
 - `src/content.config.ts`: Markdoc content collection and validation.
-- `src/data/site.ts`: Profile information and project links.
+- `src/data/site.ts`: Profile information and contact links.
+- `src/content/projects/`: Project names, descriptions, links, and display order.
 - `src/styles/global.css`: Site styles and responsive layouts.
 - `public/favicon.svg`, `public/favicon.png`, `public/assets/swallow.svg`: Original swallow assets.
 

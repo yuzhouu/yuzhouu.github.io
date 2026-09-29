@@ -1,10 +1,12 @@
 ---
 import PostList from "../components/PostList.astro";
-import { projects, site } from "../data/site";
+import { site } from "../data/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import { getPosts } from "../lib/posts";
+import { getProjects } from "../lib/projects";
 
-const posts = (await getPosts()).slice(0, 5);
+const [allPosts, projects] = await Promise.all([getPosts(), getProjects()]);
+const posts = allPosts.slice(0, 5);
 ---
 
 <SiteLayout
@@ -25,20 +27,22 @@ const posts = (await getPosts()).slice(0, 5);
     </p>
   </header>
 
-  <section class="projects" aria-labelledby="projects-title">
-    <h2 id="projects-title">Projects</h2>
-    <ul class="project-list">
-      {projects.map((project) => (
-        <li>
-          <a href={project.href} target="_blank" rel="noopener noreferrer">
-            {project.name}
-          </a>
-          {" — "}
-          {project.description}
-        </li>
-      ))}
-    </ul>
-  </section>
+  {projects.length > 0 && (
+    <section class="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">Projects</h2>
+      <ul class="project-list">
+        {projects.map(({ data: project }) => (
+          <li>
+            <a href={project.href} target="_blank" rel="noopener noreferrer">
+              {project.name}
+            </a>
+            {" — "}
+            {project.description}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
   {posts.length > 0 && (
     <section class="recent-posts" aria-labelledby="posts-title">
       <h2 id="posts-title">Posts</h2>

@@ -29,4 +29,15 @@ const timeline = defineCollection({
   }),
 });
 
-export const collections = { posts, timeline };
+const projects = defineCollection({
+  loader: glob({ pattern: "**/*.mdoc", base: "./src/content/projects" }),
+  schema: z.object({
+    name: z.string(),
+    description: z.string(),
+    href: z.url({ protocol: /^https?$/ }),
+    order: z.number().int().default(0),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { posts, timeline, projects };
