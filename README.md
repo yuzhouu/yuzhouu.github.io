@@ -27,6 +27,9 @@ the document head to avoid a flash of the wrong colors; without JavaScript, the
 site still follows the system preference. Article code highlighting, swallow
 artwork, and the guestbook follow the same theme.
 
+On narrow screens and touch devices, theme buttons keep their small icons inside
+44 × 44px transparent touch targets.
+
 ## Writing posts
 
 Create a `.mdoc` file in `src/content/posts/`. Its filename determines the post URL: for example, `hello.mdoc` becomes `/posts/hello/`.
@@ -70,6 +73,11 @@ Images load lazily by default. Use `loading="eager"` on the image tag for an ima
 ### Subscription and sharing
 
 `/rss.xml` includes published articles, projects, and timeline shares, newest first. Article links lead to the full post, project links open the project website, and shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
+
+Timeline shares use their handwritten `description` when present. Otherwise, RSS
+generates a plain-text excerpt of up to 280 characters from the Markdoc body,
+preserving link text and image descriptions while omitting formatting and hidden
+comments. Long excerpts end with an ellipsis. Posts and projects keep their own summaries.
 
 The shared preview image is `public/og.png` (1200 × 630); its editable SVG source is `src/assets/social-card.svg`. Run `pnpm og:generate` after editing the SVG. Page titles and descriptions appear in Open Graph and Twitter card metadata. Published articles also include `BlogPosting` JSON-LD with their canonical URL, author, publication date, and optional revision date.
 
@@ -118,6 +126,13 @@ and write in the body using the same Markdoc syntax as articles. `description` i
 optional, `lang` defaults to `en`, and `draft: true` hides the share from both the
 timeline and RSS. Keep filenames stable to preserve shared entry links.
 
+Players load near the viewport through Spotify's official iframe API. A loading
+message stays visible until the player reports that it is ready. After 12 seconds,
+or if its script fails, the message explains that the track can be opened directly.
+The external Spotify link remains available, including without JavaScript.
+Loading and fallback text share the player's fixed 152px area, so changing or
+hiding the message does not move the entries below it.
+
 ## Projects
 
 Each project is a `.mdoc` file in `src/content/projects/`. About, Timeline, and RSS read the project
@@ -127,7 +142,8 @@ TypeScript or page templates.
 ```md
 ---
 name: Sidebrowse
-description: Web pages in your browser sidebar.
+description: Keep AI tools, search, and reference pages beside your work.
+platforms: [Chrome extension, Microsoft Edge extension]
 href: https://yuzhouu.github.io/side-browser/
 publishedAt: 2026-09-15
 lang: en # Use zh-CN for Chinese project descriptions.
@@ -136,7 +152,9 @@ draft: false
 ---
 ```
 
-`name`, `description`, `href`, and `publishedAt` are required. The link must be a complete HTTP or
+`name`, `description`, `platforms`, `href`, and `publishedAt` are required.
+Use `description` for the main purpose and `platforms` for a non-empty list of supported platforms;
+both are displayed on About and Timeline. The link must be a complete HTTP or
 HTTPS URL. `publishedAt` is the timeline publication date and controls its position
 in the timeline and RSS. The existing projects use GitHub repository creation dates
 (`created_at`): Sidebrowse on September 15, 2026, Lento EPUB on August 31, 2026,
@@ -183,6 +201,14 @@ The widget loads its iframe lazily and provides a GitHub link when JavaScript or
 the embedded service is unavailable. Its backlink always uses the guestbook's
 production canonical URL, including when viewing the site locally.
 
+The guestbook shows a loading message while waiting for the widget to render,
+then a direct-link explanation after 12 seconds or a service error. A late widget
+response can clear the timeout notice. An empty discussion is treated as a normal
+new guestbook. The GitHub link stays available throughout.
+Status messages and the widget share one grid area, without a fixed or minimum
+height. Before the iframe arrives, only the message's own space is reserved; once
+loaded, the discussion determines the height without an extra status row.
+
 The custom themes live in `src/styles/giscus.css` and `src/styles/giscus-dark.css`.
 Astro emits versioned CSS assets which giscus loads inside its iframe; ordinary site CSS cannot style that
 iframe. Development embeds the same CSS as a data URL so the HTTPS iframe does not
@@ -206,6 +232,10 @@ The original post, “My Third Blog,” has been translated into English and kee
 The notes on this rebuild are published as “My Fourth Blog” at `/posts/my-fourth-blog/`. Each post can set `lang` to `en` (the default) or `zh-CN`; the article page uses it for HTML language, Open Graph locale, and structured metadata.
 
 ## Deployment
+
+Google Analytics is included only in production builds and starts only on the
+HTTPS hostname configured by Astro's `site` URL. Development, local production
+previews, and previews on other domains do not load the analytics script.
 
 The site URL is `https://yuzhouu.github.io/`. The workflow in `.github/workflows/deploy.yml` publishes the static `dist/` output to GitHub Pages.
 

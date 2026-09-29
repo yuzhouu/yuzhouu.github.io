@@ -20,7 +20,13 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
 
 {configured && (
   <section class="guestbook" aria-label="Guestbook messages">
-    <div class="giscus" />
+    <div class="guestbook-frame embed-frame">
+      <p class="embed-status" role="status" aria-live="polite">
+        Comments need JavaScript and a connection to GitHub. You can also view
+        the discussion directly below.
+      </p>
+      <div class="giscus" />
+    </div>
     <p class="comments-fallback">
       <a href={discussionsUrl}>View discussions on GitHub</a>
     </p>
@@ -40,6 +46,28 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
     font-size: 13px;
     line-height: 1.6;
   }
+
+  .guestbook-frame {
+    display: grid;
+  }
+
+  .guestbook-frame > .embed-status,
+  .giscus {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
+  .guestbook-frame > .embed-status {
+    /* Share the widget's space without imposing a minimum height. Before the
+       iframe arrives, the message itself supplies enough room to stay legible. */
+    position: static;
+  }
+
+  .giscus :global(iframe) {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
 </style>
 
 {configured && <script
@@ -49,6 +77,7 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
   (() => {
     const { comments, themes, development } = commentConfig;
     const container = document.querySelector(".giscus");
+    const status = container.parentElement.querySelector(".embed-status");
     const getTheme = () => document.documentElement.dataset.theme || "light";
     const client = document.createElement("script");
     client.src = "https://giscus.app/client.js";
@@ -72,6 +101,16 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
 
     let readyFrame;
     let appliedTheme;
+    let timeout;
+    let failed = false;
+    const showUnavailable = () => {
+      clearTimeout(timeout);
+      failed = true;
+      status.hidden = false;
+      status.textContent =
+        "Comments couldn't be loaded here. You can view the discussion on GitHub below.";
+    };
+    client.addEventListener("error", showUnavailable);
     function syncTheme() {
       const theme = themes[getTheme()];
       client.dataset.theme = development ? getTheme() : theme;
@@ -93,11 +132,44 @@ const discussionsUrl = `https://github.com/${comments.repo}/discussions`;
       if (readyFrame !== frame) {
         readyFrame = frame;
         appliedTheme = undefined;
+        failed = false;
+      }
+      const message = event.data.giscus;
+      // An empty guestbook has no discussion until its first comment.
+      if (
+        message.error &&
+        !message.error.includes("Discussion not found") &&
+        !message.signOut
+      ) {
+        showUnavailable();
+      } else if (message.resizeHeight > 0 && !failed) {
+        clearTimeout(timeout);
+        status.hidden = true;
       }
       // Also handles a theme change while the lazy iframe was still loading.
       syncTheme();
     });
     document.addEventListener("themechange", syncTheme);
-    container.append(client);
+    function load() {
+      status.textContent = "Loading comments…";
+      timeout = setTimeout(() => {
+        status.textContent =
+          "Comments haven't loaded. You can view the discussion on GitHub below.";
+      }, 12000);
+      container.append(client);
+    }
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          load();
+        },
+        { rootMargin: "200px" },
+      );
+      observer.observe(container.parentElement);
+    } else {
+      load();
+    }
   })();
 </script>}

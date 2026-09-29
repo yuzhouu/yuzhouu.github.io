@@ -7,21 +7,118 @@ interface Props {
 const { trackId, title } = Astro.props;
 ---
 
-<iframe
-  class="spotify-player"
-  title={`Play ${title} on Spotify`}
-  src={`https://open.spotify.com/embed/track/${trackId}`}
-  width="100%"
-  height="152"
-  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-  loading="lazy"
-></iframe>
+<div
+  class="spotify-player embed-frame"
+  data-spotify-track={trackId}
+  data-title={title}
+>
+  <p class="embed-status" role="status" aria-live="polite">
+    The player needs JavaScript and a connection to Spotify. You can also open
+    the track directly below.
+  </p>
+  <div class="spotify-mount">
+    <div data-spotify-mount />
+  </div>
+</div>
+
+<script>
+  interface SpotifyController {
+    addListener(event: "ready", callback: () => void): void;
+  }
+  interface SpotifyAPI {
+    createController(
+      element: HTMLElement,
+      options: { uri: string; width: string; height: number },
+      callback: (controller: SpotifyController) => void,
+    ): void;
+  }
+  declare global {
+    interface Window {
+      onSpotifyIframeApiReady?: (api: SpotifyAPI) => void;
+    }
+  }
+
+  // Share one API request across tracks, and wait until a player is near view.
+  let apiPromise: Promise<SpotifyAPI> | undefined;
+  function loadAPI() {
+    return (apiPromise ??= new Promise<SpotifyAPI>((resolve, reject) => {
+      window.onSpotifyIframeApiReady = resolve;
+      const script = document.createElement("script");
+      script.src = "https://open.spotify.com/embed/iframe-api/v1";
+      script.async = true;
+      script.onerror = () => reject(new Error("Spotify could not be loaded"));
+      document.head.append(script);
+    }));
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-spotify-track]")
+    .forEach((player) => {
+      const status = player.querySelector<HTMLElement>(".embed-status")!;
+      const mount = player.querySelector<HTMLElement>("[data-spotify-mount]")!;
+
+      async function load() {
+        status.textContent = "Loading Spotify…";
+        const timeout = window.setTimeout(() => {
+          status.textContent =
+            "Spotify hasn't loaded. You can open the track directly below.";
+        }, 12000);
+        try {
+          const api = await loadAPI();
+          api.createController(
+            mount,
+            {
+              uri: `spotify:track:${player.dataset.spotifyTrack}`,
+              width: "100%",
+              height: 152,
+            },
+            (controller) => {
+              const frame = player.querySelector("iframe");
+              if (frame)
+                frame.title = `Play ${player.dataset.title} on Spotify`;
+              // The documented ready event confirms the player initialized;
+              // iframe load alone also fires for blank or blocked documents.
+              controller.addListener("ready", () => {
+                window.clearTimeout(timeout);
+                status.hidden = true;
+              });
+            },
+          );
+        } catch {
+          window.clearTimeout(timeout);
+          status.textContent =
+            "Spotify couldn't be loaded here. Open the track directly below.";
+        }
+      }
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            observer.disconnect();
+            void load();
+          },
+          { rootMargin: "200px" },
+        );
+        observer.observe(player);
+      } else {
+        void load();
+      }
+    });
+</script>
 
 <style>
   .spotify-player {
+    margin-top: 14px;
+    height: 152px;
+  }
+  .spotify-mount {
+    min-height: 152px;
+  }
+  .spotify-player :global(iframe) {
     display: block;
     width: 100%;
-    margin-top: 14px;
+    height: 152px;
     border: 0;
     border-radius: 12px;
     color-scheme: normal;

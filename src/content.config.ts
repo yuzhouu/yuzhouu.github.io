@@ -34,6 +34,7 @@ const projects = defineCollection({
   schema: z.object({
     name: z.string(),
     description: z.string(),
+    platforms: z.array(z.string().min(1)).min(1),
     href: z.url({ protocol: /^https?$/ }),
     publishedAt: z.coerce.date(),
     lang: z.enum(["en", "zh-CN"]).default("en"),

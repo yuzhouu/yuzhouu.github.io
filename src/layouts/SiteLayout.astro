@@ -28,6 +28,7 @@ const {
 const pageTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const shareImage = new URL("/og.png", Astro.site);
+const analyticsHostname = Astro.site?.hostname;
 const articleSchema =
   article && publishedAt
     ? {
@@ -50,20 +51,29 @@ const articleSchema =
 <html {lang}>
   <head>
     <meta charset="UTF-8" />
-    <!-- Google tag (gtag.js) -->
-    <script
+    {import.meta.env.PROD && analyticsHostname && <script
       is:inline
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-7VJGWHQDZF"
-    ></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        window.dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-7VJGWHQDZF");
-    </script>
+      define:vars={{ analyticsHostname }}
+    >
+      (() => {
+        // Also exclude local previews of the production build.
+        if (
+          location.hostname !== analyticsHostname ||
+          location.protocol !== "https:"
+        )
+          return;
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+        gtag("config", "G-7VJGWHQDZF");
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-7VJGWHQDZF";
+        document.head.append(script);
+      })();
+    </script>}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="author" content={site.name} />

@@ -2,6 +2,7 @@ import rss from "@astrojs/rss";
 import type { APIRoute } from "astro";
 import { site } from "../data/site";
 import { getTimeline } from "../lib/timeline";
+import { shareSummary } from "../lib/share-summary";
 
 export const GET: APIRoute = async (context) =>
   rss({
@@ -11,7 +12,10 @@ export const GET: APIRoute = async (context) =>
     items: (await getTimeline()).map((item) => ({
       title:
         item.kind === "project" ? item.entry.data.name : item.entry.data.title,
-      description: item.entry.data.description,
+      description:
+        item.kind === "share"
+          ? shareSummary(item.entry.body, item.entry.data.description)
+          : item.entry.data.description,
       pubDate: item.entry.data.publishedAt,
       // Absolute URLs keep the RSS generator from appending a slash to anchors.
       link: new URL(item.href, context.site!).href,

@@ -504,6 +504,40 @@ main:focus {
 .empty-state {
   font-size: 16px;
 }
+.embed-frame {
+  position: relative;
+}
+.embed-status {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 20px;
+  color: var(--muted);
+  background: var(--paper);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.embed-status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.project-platforms {
+  margin-top: 3px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.5;
+}
+@media (max-width: 600px), (any-pointer: coarse) {
+  .theme-control button {
+    width: 44px;
+    height: 44px;
+  }
+}
 @media (max-width: 600px) {
   :root {
     font-size: 16px;

@@ -76,6 +76,11 @@ const items = await Promise.all(
               {entry.data.description && (
                 <p class="timeline-description">{entry.data.description}</p>
               )}
+              {item.kind === "project" && (
+                <p class="project-platforms">
+                  {item.entry.data.platforms.join(" · ")}
+                </p>
+              )}
               {!trackId && Content && (
                 <div class="prose timeline-body">
                   <Content />
