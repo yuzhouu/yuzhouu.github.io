@@ -78,4 +78,12 @@ The notes on this rebuild are published as “My Fourth Blog” at `/posts/my-fo
 
 ## Deployment
 
-The site URL is `https://yuzhouu.github.io/`. Select **GitHub Actions** in the GitHub Pages settings. Pushing to `main` runs the workflow to check, build, and deploy the site. No server or additional adapter is needed.
+The site URL is `https://yuzhouu.github.io/`. The workflow in `.github/workflows/deploy.yml` publishes the static `dist/` output to GitHub Pages.
+
+1. In the repository's **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
+2. Commit the site source, configuration, and `pnpm-lock.yaml`, then push to `main`. Each push automatically starts a deployment.
+3. Open **Actions → Deploy to GitHub Pages** to follow the run. You can also choose **Run workflow** on `main` to publish manually.
+
+The workflow uses Node.js 24 and reads the pnpm version from `package.json`. It installs locked dependencies, checks formatting and Astro types, builds the site, uploads the Pages artifact, and deploys it through the `github-pages` environment. New runs wait for an active deployment to finish.
+
+No server, additional adapter, custom token, or `gh-pages` branch is needed. This is a user site, so the Astro `site` URL uses the domain root without a repository-name `base` path.

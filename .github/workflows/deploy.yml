@@ -1,4 +1,4 @@
-name: Deploy blog
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -12,18 +12,20 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
       - name: Install, check, build, and upload
         uses: withastro/action@v6
         with:
           node-version: 24
-          package-manager: pnpm@11.1.1
           build-cmd: pnpm format:check && pnpm build
 
   deploy:
