@@ -55,6 +55,16 @@ const items = await Promise.all(
               <span>{kind}</span>
             </div>
             <div lang={entry.data.lang}>
+              {trackId && Content && (
+                <div class="music-recommendation">
+                  <div class="prose timeline-body">
+                    <span class="music-recommendation-label" lang="zh-CN">
+                      「听歌碎念」
+                    </span>
+                    <Content />
+                  </div>
+                </div>
+              )}
               <h2 id={`${item.id}-title`}>
                 {item.kind === "project" ? (
                   <a href={item.href} target="_blank" rel="noopener noreferrer">
@@ -69,7 +79,7 @@ const items = await Promise.all(
               {entry.data.description && (
                 <p class="timeline-description">{entry.data.description}</p>
               )}
-              {Content && (
+              {!trackId && Content && (
                 <div class="prose timeline-body">
                   <Content />
                 </div>
@@ -159,6 +169,18 @@ const items = await Promise.all(
   }
   .timeline-body {
     font-size: 16px;
+  }
+  .music-recommendation {
+    margin: 16px 0 28px;
+  }
+  .music-recommendation .timeline-body {
+    display: flow-root;
+    font-size: 14px;
+  }
+  .music-recommendation-label {
+    float: left;
+    margin-right: 0.35em;
+    color: var(--muted);
   }
   .spotify-link {
     display: inline-block;
