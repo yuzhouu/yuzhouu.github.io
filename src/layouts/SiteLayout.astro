@@ -12,8 +12,9 @@ interface Props {
   article?: boolean;
   publishedAt?: Date;
   updatedAt?: Date;
-  lang?: "en" | "zh-CN";
+  lang?: "en" | "zh-CN" | "ja";
   noindex?: boolean;
+  music?: { title: string; description?: string; url: string };
 }
 const {
   title,
@@ -24,6 +25,7 @@ const {
   updatedAt,
   lang = "en",
   noindex = false,
+  music,
 } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -43,6 +45,14 @@ const articleSchema =
         ...(updatedAt && { dateModified: updatedAt.toISOString() }),
         author: { "@type": "Person", name: site.name, url: site.github },
         inLanguage: lang,
+        ...(music && {
+          about: {
+            "@type": "MusicRecording",
+            name: music.title,
+            description: music.description,
+            url: music.url,
+          },
+        }),
       }
     : undefined;
 ---
@@ -100,7 +110,10 @@ const articleSchema =
       href={new URL("/rss.xml", Astro.site)}
     />
     <meta property="og:type" content={article ? "article" : "website"} />
-    <meta property="og:locale" content={lang === "zh-CN" ? "zh_CN" : "en_US"} />
+    <meta
+      property="og:locale"
+      content={{ "zh-CN": "zh_CN", en: "en_US", ja: "ja_JP" }[lang]}
+    />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />

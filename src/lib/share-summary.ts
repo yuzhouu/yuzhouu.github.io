@@ -29,8 +29,7 @@ function textContent(node: unknown): string {
   return blocks.has(node.name) ? `${text} ` : text;
 }
 
-export function shareSummary(body: string | undefined, description?: string) {
-  if (description?.trim()) return description.trim();
+export function shareTextSummary(body: string | undefined) {
   if (!body?.trim()) return undefined;
 
   // Match the site's tokenizer, including hidden HTML comments. Transform first
@@ -40,10 +39,14 @@ export function shareSummary(body: string | undefined, description?: string) {
   const rendered = Markdoc.transform(ast, { tags: { image: nodes.image } });
   const text = textContent(rendered).replace(/\s+/g, " ").trim();
   const characters = Array.from(text);
-  const excerpt =
-    characters.length > 280
-      ? `${characters.slice(0, 280).join("").trimEnd()}…`
-      : text;
+  return characters.length > 280
+    ? `${characters.slice(0, 280).join("").trimEnd()}…`
+    : text || undefined;
+}
+
+export function shareSummary(body: string | undefined, description?: string) {
+  if (description?.trim()) return description.trim();
+  const excerpt = shareTextSummary(body);
 
   // RSS descriptions may be interpreted as HTML by readers; keep automatic
   // excerpts as text even when a share discusses HTML or comparison operators.

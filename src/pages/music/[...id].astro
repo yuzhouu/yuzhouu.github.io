@@ -1,0 +1,104 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import SpotifyTrack from "../../components/SpotifyTrack.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { getMusic, musicDescription } from "../../lib/music";
+import { formatDate } from "../../lib/posts";
+
+export async function getStaticPaths() {
+  return (await getMusic()).map((music) => ({
+    params: { id: music.id },
+    props: { music },
+  }));
+}
+
+interface Props {
+  music: CollectionEntry<"timeline">;
+}
+const { music } = Astro.props;
+const { Content } = await render(music);
+// getMusic only returns published entries with a Spotify track.
+const trackId = music.data.spotifyTrackId!;
+const spotifyUrl = `https://open.spotify.com/track/${trackId}`;
+const timelineUrl = `/#${encodeURIComponent(`share-${music.id}`)}`;
+---
+
+<SiteLayout
+  title={music.data.title}
+  description={musicDescription(music)}
+  publishedAt={music.data.publishedAt}
+  lang={music.data.lang}
+  active="timeline"
+  article
+  music={{
+    title: music.data.title,
+    description: music.data.description,
+    url: spotifyUrl,
+  }}
+>
+  <div class="reading-column">
+    <a class="back-link" href={timelineUrl}>
+      Back to timeline
+    </a>
+    <article>
+      <header class="article-heading">
+        <h1>{music.data.title}</h1>
+        {music.data.description && (
+          <p class="music-description">{music.data.description}</p>
+        )}
+        <div class="music-meta">
+          <time datetime={music.data.publishedAt.toISOString()}>
+            {formatDate(music.data.publishedAt)}
+          </time>
+          <span aria-hidden="true">·</span>
+          <span>Music</span>
+        </div>
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+      <SpotifyTrack trackId={trackId} title={music.data.title} />
+      <a
+        class="spotify-link"
+        href={spotifyUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open in Spotify <span aria-hidden="true">↗</span>
+      </a>
+    </article>
+    <div class="article-end">
+      <a class="back-link" href={timelineUrl}>
+        Back to timeline
+      </a>
+    </div>
+  </div>
+</SiteLayout>
+
+<style>
+  .article-heading h1,
+  .music-description {
+    overflow-wrap: anywhere;
+  }
+  .music-description {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  .music-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 7px;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .spotify-link {
+    display: inline-block;
+    margin-top: 9px;
+    font-family: var(--sans);
+    font-size: 12px;
+  }
+</style>

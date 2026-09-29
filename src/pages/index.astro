@@ -42,7 +42,7 @@ const items = await Promise.all(
             <div class="timeline-meta">
               <a
                 class="timeline-date"
-                href={`/#${encodeURIComponent(item.id)}`}
+                href={trackId ? item.href : `/#${encodeURIComponent(item.id)}`}
                 aria-label={`Link to ${title}`}
               >
                 <time datetime={entry.data.publishedAt.toISOString()}>
@@ -80,7 +80,7 @@ const items = await Promise.all(
               ) : (
                 <>
                   <h2 id={`${item.id}-title`}>
-                    {item.kind === "post" ? (
+                    {item.kind === "post" || trackId ? (
                       <a href={item.href}>{title}</a>
                     ) : (
                       title

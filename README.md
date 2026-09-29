@@ -72,7 +72,7 @@ Images load lazily by default. Use `loading="eager"` on the image tag for an ima
 
 ### Subscription and sharing
 
-`/rss.xml` includes published articles, projects, and timeline shares, newest first. Article links lead to the full post, project links open the project website, and shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
+`/rss.xml` includes published articles, projects, and timeline shares, newest first. Article and music links lead to their detail pages, project links open the project website, and other shares link to their entry on the timeline. Every page declares the feed for RSS readers, and the footer has a subscription link.
 
 Timeline shares use their handwritten `description` when present. Otherwise, RSS
 generates a plain-text excerpt of up to 280 characters from the Markdoc body,
@@ -86,8 +86,13 @@ default description from `src/data/site.ts`. The same file holds the short tagli
 used on Timeline, About, and in preview-image alternative text. Keep the social
 card SVG copy in sync when changing that tagline, then regenerate `public/og.png`.
 Other pages keep their own titles and descriptions; the post archive has a
-dedicated summary, and individual articles use their frontmatter. Timeline shares
-remain part of the home page, with anchor links rather than separate detail pages.
+dedicated summary, and individual articles use their frontmatter. Music shares
+have static detail pages at `/music/<filename>/` with their own canonical URL,
+title, Open Graph and Twitter metadata, and a description drawn from the song's
+title, description, and plain-text body (up to 160 characters, plus an ellipsis).
+Their `BlogPosting` JSON-LD identifies the shared song as a `MusicRecording` and
+links to Spotify. Published music pages are included in the sitemap automatically.
+Other timeline shares keep home-page anchor links.
 
 ## Timeline
 
@@ -95,12 +100,14 @@ The **Timeline** navigation link opens the home page (`/`), where published arti
 projects, and short shares appear together in reverse chronological order. Articles are pulled
 from the existing posts collection automatically, with a title and summary linking
 to the full post. Projects come from the projects collection, show a **Project** label,
-and link to their website. Each timeline date is a permanent link to that entry.
+and link to their website. Music titles and dates link to their detail pages;
+other timeline dates link to the entry's home-page anchor. Existing music anchors
+remain available for previously shared links.
 
 The old `/timeline/` address redirects to the home page, preserving entry anchors
 and query parameters when JavaScript is enabled. Without JavaScript it redirects
-to the top of the home page. RSS share links point directly to the new home-page
-anchors. The old redirect page is excluded from the sitemap.
+to the top of the home page. RSS links use music detail pages or home-page anchors
+as appropriate. The old redirect page is excluded from the sitemap.
 
 To share a song or a short note, create a `.mdoc` file in `src/content/timeline/`:
 
@@ -109,7 +116,7 @@ To share a song or a short note, create a `.mdoc` file in `src/content/timeline/
 title: ルミリー — 2022 Remaster
 description: Gesu No Kiwami Otome
 publishedAt: 2026-09-29
-lang: ja
+lang: en
 spotifyTrackId: 6Xz7bz7k4pjaQRmCCll9OG
 draft: false
 ---
@@ -119,12 +126,14 @@ Optional words to go with the song.
 
 Copy `spotifyTrackId` from the end of a Spotify track URL (without any query
 parameters). Songs include a compact, lazy-loaded Spotify player, so visitors can
-play them directly on the timeline, plus an ordinary Spotify link. Playback
+play them directly on the timeline and detail page, plus an ordinary Spotify link. Playback
 availability and full-track access are controlled by Spotify for each listener.
 There is no autoplay or API key. For a text or link share, omit `spotifyTrackId`
 and write in the body using the same Markdoc syntax as articles. `description` is
-optional, `lang` defaults to `en`, and `draft: true` hides the share from both the
-timeline and RSS. Keep filenames stable to preserve shared entry links.
+optional. `lang` describes the written commentary (not the song's language),
+accepts `en`, `zh-CN`, or `ja`, and defaults to `en`. `draft: true` hides the share
+from the timeline, RSS, music detail pages, and sitemap. Keep filenames stable to
+preserve shared entry links.
 
 Players load near the viewport through Spotify's official iframe API. A loading
 message stays visible until the player reports that it is ready. After 12 seconds,
@@ -219,7 +228,7 @@ through giscus's `setConfig` message without reloading the discussion.
 
 ### Source files
 
-- `src/pages/`: Timeline home, About, post archive, post pages, guestbook, RSS, legacy timeline redirect, and 404.
+- `src/pages/`: Timeline home, About, post archive, post and music detail pages, guestbook, RSS, legacy timeline redirect, and 404.
 - `src/layouts/SiteLayout.astro`: Shared page layout and metadata.
 - `src/content.config.ts`: Markdoc content collection and validation.
 - `src/data/site.ts`: Profile information and contact links.

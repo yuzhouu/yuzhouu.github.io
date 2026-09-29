@@ -1,6 +1,7 @@
 import { getCollection } from "astro:content";
 import { getPosts, postUrl } from "./posts";
 import { getProjects } from "./projects";
+import { musicUrl } from "./music";
 
 export async function getTimeline() {
   const [posts, shares, projects] = await Promise.all([
@@ -13,7 +14,9 @@ export async function getTimeline() {
     ...shares.map((entry) => ({
       kind: "share" as const,
       id: `share-${entry.id}`,
-      href: `/#${encodeURIComponent(`share-${entry.id}`)}`,
+      href: entry.data.spotifyTrackId
+        ? musicUrl(entry.id)
+        : `/#${encodeURIComponent(`share-${entry.id}`)}`,
       entry,
     })),
     ...posts.map((entry) => ({
